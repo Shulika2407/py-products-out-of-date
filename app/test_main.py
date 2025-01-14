@@ -1,11 +1,10 @@
 import pytest
 import datetime
 from app.main import outdated_products
-from pytest_mock import MockerFixture
 
 
 @pytest.mark.parametrize(
-    "list_of_products, mock_today, result",
+    "list_of_products, result",
     [
         pytest.param(
             [
@@ -19,12 +18,12 @@ from pytest_mock import MockerFixture
                     "expiration_date": datetime.date(2026, 2, 5),
                     "price": 120
                 }
-            ], datetime.date.today(), ["salmon"], id="one_products"),
+            ], ["salmon"], id="one_products"),
         pytest.param(
             [
                 {
                     "name": "salmon",
-                    "expiration_date": datetime.date(2022, 2, 10),
+                    "expiration_date": datetime.date.today(),
                     "price": 600
                 },
                 {
@@ -37,13 +36,10 @@ from pytest_mock import MockerFixture
                     "expiration_date": datetime.date(2025, 1, 13),
                     "price": 160
                 }
-            ], datetime.date.today(),
-            ["salmon", "duck"], id="two_products"),
+            ],
+            ["duck"], id="two_products"),
     ]
 )
-def test_outdated_products(mocker: MockerFixture,
-                           list_of_products: list,
-                           mock_today: datetime, result: list) -> None:
-    mocker.patch.object(datetime.date, "today", return_value=mock_today)
+def test_outdated_products(list_of_products: list, result: list) -> None:
     res = outdated_products(list_of_products)
     assert res == result
